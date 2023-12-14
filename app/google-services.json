@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "624267917006",
+    "firebase_url": "https://doc-pal-default-rtdb.firebaseio.com",
+    "project_id": "doc-pal",
+    "storage_bucket": "doc-pal.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:624267917006:android:c0b96b1fa577600c64429f",
+        "android_client_info": {
+          "package_name": "com.android.hmh.docpal"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "624267917006-iisgic6cg3i3vs28vig19lfu7c1t912i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEGKq6KVqqmPINV8YCzv2wkOqXbxPC8-U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "624267917006-iisgic6cg3i3vs28vig19lfu7c1t912i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

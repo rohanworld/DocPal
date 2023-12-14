@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".ChaaatPage">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFFFFF"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+
+        <TextView
+            android:id="@+id/doctorNameHereForNewChat"
+            android:layout_width="245dp"
+            android:fontFamily="@font/dinroundpro_bold"
+            android:layout_height="36dp"
+            android:gravity="center_vertical"
+            android:text="Dr. Name Comes here"
+            android:textSize="24sp"
+            tools:layout_editor_absoluteX="54dp"
+            tools:layout_editor_absoluteY="26dp" />
+
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:text="V"
+            android:backgroundTint="#00BCD5"
+            android:id="@+id/vcallbtn"/>
+        <Button
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:text="A"
+            android:backgroundTint="#00BCD5"
+            android:id="@+id/acallbtn"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/lvConversation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/form"
+        android:layout_below="@+id/toolbar2"
+        android:divider="@null"
+        android:dividerHeight="0dp"
+        android:paddingBottom="10dp"
+        android:text="" />
+
+    <LinearLayout
+        android:id="@+id/form"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:background="#91f1f1f1"
+        android:orientation="horizontal"
+        android:paddingBottom="2dp" >
+
+
+        <EditText
+            android:id="@+id/etMessage"
+            android:textIsSelectable="true"
+            android:layout_width="252dp"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/button1"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/attachFileBtn"
+            android:layout_weight="0.72"
+            android:ems="10"
+            android:hint="Message..."
+            android:maxHeight="80dp"
+            android:minHeight="48dp" />
+
+        <ImageView
+            android:id="@+id/attachFileBtn"
+            android:src="@drawable/baseline_attach_file_24"
+            android:layout_width="30dp"
+            android:layout_height="48dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/sendMessageButton"/>
+
+        <ImageButton
+            android:id="@+id/btnSendMsg"
+            android:background="@drawable/baseline_send_24"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true" />
+    </LinearLayout>
+
+</RelativeLayout>
