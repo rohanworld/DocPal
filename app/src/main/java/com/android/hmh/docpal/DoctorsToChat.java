@@ -3,6 +3,7 @@ package com.android.hmh.docpal;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
@@ -11,6 +12,9 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,8 +70,12 @@ public class DoctorsToChat extends AppCompatActivity {
     }
 
     private void openChatActivity(SimpleDoctors doctor) {
+//        String userID = Registration.getUserName(DoctorsToChat.this);
+//        startService(userID);
+
         Intent chatIntent = new Intent(DoctorsToChat.this, ChaaatPage.class);
         chatIntent.putExtra("doctorName", doctor.getName());
         startActivity(chatIntent);
     }
+
 }

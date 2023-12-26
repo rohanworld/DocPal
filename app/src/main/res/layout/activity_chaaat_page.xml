@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -20,8 +21,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0">
-
-
         <TextView
             android:id="@+id/doctorNameHereForNewChat"
             android:layout_width="245dp"
@@ -33,20 +32,24 @@
             tools:layout_editor_absoluteX="54dp"
             tools:layout_editor_absoluteY="26dp" />
 
-        <Button
+        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:text="V"
-            android:backgroundTint="#00BCD5"
+            android:gravity="center"
             android:id="@+id/vcallbtn"/>
-        <Button
+        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
             android:layout_width="60dp"
             android:layout_height="50dp"
-            android:text="A"
-            android:backgroundTint="#00BCD5"
+            android:gravity="center"
             android:id="@+id/acallbtn"/>
-
     </androidx.appcompat.widget.Toolbar>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="visible" />
 
     <ListView
         android:id="@+id/lvConversation"
@@ -65,12 +68,15 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
-        android:background="#91f1f1f1"
+        android:background="#f1f1f1"
         android:orientation="horizontal"
         android:paddingBottom="2dp" >
 
 
         <EditText
+            android:clickable="true"
+            android:autoLink="all"
+            android:linksClickable="true"
             android:id="@+id/etMessage"
             android:textIsSelectable="true"
             android:layout_width="252dp"

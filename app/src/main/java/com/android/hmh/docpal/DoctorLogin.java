@@ -3,6 +3,7 @@ package com.android.hmh.docpal;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +12,10 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
+import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
 
 public class DoctorLogin extends AppCompatActivity {
     EditText enterdocusername, enterdocpass;
@@ -35,6 +40,8 @@ public class DoctorLogin extends AppCompatActivity {
 
                 saveUserInfo(docUsername);
                 if(!docUsername.isEmpty() && !docPass.isEmpty()){
+                    startService(docUsername);
+
                     Intent i = new Intent(DoctorLogin.this, HomePageDoctor.class);
                     startActivity(i);
 
@@ -54,5 +61,23 @@ public class DoctorLogin extends AppCompatActivity {
     public static String getDoctorName(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(DOC_PREF_NAME, MODE_PRIVATE);
         return preferences.getString(DOC_KEY_NAME, "");
+    }
+
+    private void startService(String userID) {
+        Application application = getApplication() ; // Android's application context
+        long appID = 55023617;   // yourAppID
+        String appSign = "e06f4dc7104a44c637b0e76d1e5e16fdb31c01b9208cd49901375dd3b904de01";  // yourAppSign
+        String userName = userID;
+        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+        ZegoNotificationConfig notificationConfig = new ZegoNotificationConfig();
+        notificationConfig.sound = "zego_uikit_sound_call";
+        notificationConfig.channelID = "CallInvitation";
+        notificationConfig.channelName = "CallInvitation";
+        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        ZegoUIKitPrebuiltCallInvitationService.unInit();
     }
 }

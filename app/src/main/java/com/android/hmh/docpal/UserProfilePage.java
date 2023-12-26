@@ -1,9 +1,11 @@
 package com.android.hmh.docpal;
 
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -14,6 +16,11 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.auth.User;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class UserProfilePage extends AppCompatActivity {
     ImageView logoutBtn, profilePage;
@@ -39,20 +46,50 @@ public class UserProfilePage extends AppCompatActivity {
         String userGmail = Registration.getUserGmailID(getApplicationContext());
 
         userProfileNameHere.setText(userName);
-        genderAndDob.setText("Gender: "+userGender+" | DOB: "+userDob);
         userGMailHere.setText(userGmail);
+//        genderAndDob.setText("Gender: "+userGender+" | DoB: "+userDob);
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        Date dobDate = null;
+        try {
+            dobDate = sdf.parse(userDob);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        String formattedDob = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(dobDate);
+        genderAndDob.setText("Gender: " + userGender + " | DoB: " + formattedDob);
 
         logoutBtn = findViewById(R.id.logoutBtn);
         logoutBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                showConfirmationAlert();
+            }
+        });
+    }
+
+    private void showConfirmationAlert() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserProfilePage.this);
+        builder.setTitle("Log Out Confirmation");
+        builder.setMessage("Are you sure want to Log Out?");
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
                 clearSharedPreferences();
-                Intent i = new Intent(UserProfilePage.this, MainActivity.class);
-                startActivity(i);
+                Intent iy = new Intent(UserProfilePage.this, MainActivity.class);
+                startActivity(iy);
                 finish();
             }
         });
+        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.show();
+
     }
 
     private void clearSharedPreferences() {

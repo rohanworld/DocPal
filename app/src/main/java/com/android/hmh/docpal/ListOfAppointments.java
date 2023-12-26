@@ -47,11 +47,13 @@ public class ListOfAppointments extends AppCompatActivity {
 //                                        String patientName = appointmentSnapshot.getString("name");
                                         String imageURL = appointmentSnapshot.getString("patientImageURL"); // Add field for patient image
 //                                        String timeSlot = appointmentSnapshot.getString("sessionDetails");
-                                        String timeSlot = appointmentSnapshot.getString("timeSlot");
+                                        String dateSlot = appointmentSnapshot.getString("date");
+                                        String timingSlot = appointmentSnapshot.getString("timeSlot");
+                                        String timeSlot = dateSlot+" | "+timingSlot;
                                         String gender = appointmentSnapshot.getString("userGender");
                                         int age = appointmentSnapshot.getLong("userAge").intValue();
-                                        String symptoms = appointmentSnapshot.getString("userSymptoms");
-                                        Patient patient = new Patient( imageURL, patientName, timeSlot, gender, age, symptoms);
+                                        String symptoms = appointmentSnapshot.getString("symptoms");
+                                        Patient patient = new Patient( patientName,imageURL, timeSlot, gender, age, symptoms);
                                         appointmentList.add(patient);
                                     }
 

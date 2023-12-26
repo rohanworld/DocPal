@@ -60,7 +60,7 @@ public class DetailedBookAppointment extends AppCompatActivity {
         doctorImage = findViewById(R.id.imageInDetails);
         doctorName = findViewById(R.id.doctorName);
         doctorExperience = findViewById(R.id.doctorExperience);
-        doctorRatings = findViewById(R.id.doctorRatings);
+        doctorRatings = findViewById(R.id.doctorRatingsForDetailedBooking);
         confirmApptBtn = findViewById(R.id.confirmApptBtn);
         symptoms = findViewById(R.id.describeSymptons);
         timeSlotsRadioGroup = findViewById(R.id.timeSlotsRadioGroup);
@@ -79,7 +79,8 @@ public class DetailedBookAppointment extends AppCompatActivity {
 
         doctorName.setText(docName);
         doctorExperience.setText(docExp + " years of Experience");
-        doctorRatings.setText(doctorRatings + " ratings");
+        doctorRatings.setText(docRatings + " ratings");
+//        Toast.makeText(this, doctorRatings, Toast.LENGTH_SHORT).show();
         Glide.with(DetailedBookAppointment.this)
                 .load(docImg)
                 .into(doctorImage);
@@ -95,7 +96,9 @@ public class DetailedBookAppointment extends AppCompatActivity {
                         RadioGroup.LayoutParams.WRAP_CONTENT,
                         RadioGroup.LayoutParams.WRAP_CONTENT
                 );
-                params.setMargins(5,1,5, 1 );
+//                params.setMargins(5,1,5, 1 );
+                params.setMargins(dpToPx(5), dpToPx(1), dpToPx(5), dpToPx(1));
+
                 radioButton.setLayoutParams(params);
             }
 
@@ -138,6 +141,12 @@ public class DetailedBookAppointment extends AppCompatActivity {
             }
         });
     }
+
+    private int dpToPx(int dp) {
+        float density = getResources().getDisplayMetrics().density;
+        return Math.round(dp * density);
+    }
+
 
     private void aaaaddBookingDetails() {
         // Get the selected time slot
@@ -240,6 +249,10 @@ public class DetailedBookAppointment extends AppCompatActivity {
                         appointmentRef.add(appointmentData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                             @Override
                             public void onSuccess(DocumentReference documentReference) {
+                                //Add booking Details to my document also
+                                addBookingDetailsToMyDocumentAlso(docName, docExp, docRatings, docImg, patientSymptoms, selectedTimeSlot, currentDate);
+
+
                                 Toast.makeText(DetailedBookAppointment.this, "Booked Confirmed", Toast.LENGTH_SHORT).show();
                                 //start new intetn for bokingconfirmed actiit
                                 Intent i = new Intent(DetailedBookAppointment.this, BookingConfirmedPage.class);
@@ -262,5 +275,45 @@ public class DetailedBookAppointment extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    private void addBookingDetailsToMyDocumentAlso(String docName, String docExp, String docRatings, String docImg, String patientSymptoms, String selectedTimeSlot, String currentDate) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").whereEqualTo("name", Registration.getUserName(DetailedBookAppointment.this)).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
+                    DocumentReference doctorRef = document.getReference();
+//                    CollectionReference appointmentRef = doctorRef.collection("appointments");
+                    CollectionReference appointmentRef = doctorRef.collection("myAppointments");
+                    Map<String, Object> appointmentData = new HashMap<>();
+                    appointmentData.put("myDoctorName", docName);
+                    appointmentData.put("myDoctorExperience", docExp);
+                    appointmentData.put("myDoctorRatings", docRatings);
+                    appointmentData.put("myDoctorImg", docImg);
+                    appointmentData.put("mySymptoms", patientSymptoms);
+                    appointmentData.put("myTimeSlot", selectedTimeSlot);
+                    appointmentData.put("myDate", currentDate);
+
+                    appointmentRef.add(appointmentData).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                        @Override
+                        public void onSuccess(DocumentReference documentReference) {
+                            Toast.makeText(DetailedBookAppointment.this, "Booking Added to my Document also", Toast.LENGTH_SHORT).show();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("booking failed in my document also", "onFailure: " + e);
+                        }
+                    });
+                    break;
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(DetailedBookAppointment.this, "Error saving my doctor also", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }

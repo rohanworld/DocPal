@@ -6,14 +6,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.PhoneAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,6 +42,8 @@ public class PhoneNumber extends AppCompatActivity {
         number = findViewById(R.id.entermobileNumber);
         ContinueOtp = findViewById(R.id.sendotp);
 
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+
         String name = getIntent().getStringExtra("name");
         String mail = getIntent().getStringExtra("mail");
         String gender = getIntent().getStringExtra("gender");
@@ -53,6 +61,17 @@ public class PhoneNumber extends AppCompatActivity {
                     number.setError("Number cannot be empty");
                     return;
                 }
+                mAuth.createUserWithEmailAndPassword(mail, password).addOnCompleteListener(PhoneNumber.this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if(task.isSuccessful()){
+                            Toast.makeText(PhoneNumber.this, "User Authenticated...", Toast.LENGTH_SHORT).show();
+                        }else{
+                            Toast.makeText(PhoneNumber.this, String.valueOf(task.getException()), Toast.LENGTH_SHORT).show();
+                            Log.d("errorrrrrr", String.valueOf(task.getException()));
+                        }
+                    }
+                });
                 saveUserDataToFirestore(name, mail, gender, unumber, dob, password, age);
                 Intent openOtpPage = new Intent(PhoneNumber.this, OtpPage.class);
                 openOtpPage.putExtra("phone", "+91"+unumber);

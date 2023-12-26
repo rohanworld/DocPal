@@ -12,8 +12,6 @@ import android.widget.Button;
 import android.window.OnBackInvokedDispatcher;
 
 public class MainActivity extends AppCompatActivity {
-
-
     Button doctorLogin, patientLogin;
     @SuppressLint("MissingInflatedId")
     @Override

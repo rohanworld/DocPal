@@ -1,5 +1,7 @@
 package com.android.hmh.docpal;
 
+import static android.app.Activity.RESULT_OK;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -16,6 +18,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
@@ -24,6 +28,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -35,10 +40,14 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
+import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,10 +60,12 @@ public class ChaaatPage extends AppCompatActivity {
     ImageView attachFileBtn;
     EditText etMsg;
 
+    ProgressBar progressBar;
+    ZegoSendCallInvitationButton vcallbtn, acallbtn;
     ListView lvDiscussion;
     ArrayList<String> listConversation = new ArrayList<String>();
     ArrayAdapter arrayAdpt;
-    String UserName, SelectedTopic, user_msg_key;
+    String UserName, SelectedTopic, user_msg_key, sendingMsgTo;
 
     private DatabaseReference dbr;
     @SuppressLint("MissingInflatedId")
@@ -63,13 +74,24 @@ public class ChaaatPage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chaaat_page);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        progressBar = findViewById(R.id.progressBar);
+        progressBar.setVisibility(View.GONE);
         doctorNameHereForNewChat = findViewById(R.id.doctorNameHereForNewChat);
         attachFileBtn = findViewById(R.id.attachFileBtn);
-        UserName = Registration.getUserName(ChaaatPage.this);
+        vcallbtn = findViewById(R.id.vcallbtn);
+        acallbtn = findViewById(R.id.acallbtn);
+
+
         btnSendMsg = findViewById(R.id.btnSendMsg);
         etMsg = (EditText) findViewById(R.id.etMessage);
 
-        String sendingMsgTo = getIntent().getStringExtra("doctorName");
+        sendingMsgTo = getIntent().getStringExtra("doctorName");
+        UserName = Registration.getUserName(ChaaatPage.this);
+        setVoiceCall(sendingMsgTo);
+        setVideoCall(sendingMsgTo);
+
+
+
         doctorNameHereForNewChat.setText(sendingMsgTo);
 
         lvDiscussion = (ListView) findViewById(R.id.lvConversation);
@@ -131,6 +153,17 @@ public class ChaaatPage extends AppCompatActivity {
         });
     }
 
+    private void setVoiceCall(String sendingMsgTo) {
+        vcallbtn.setIsVideoCall(false);
+        vcallbtn.setResourceID("zego_uikit_call");
+        vcallbtn.setInvitees(Collections.singletonList(new ZegoUIKitUser(sendingMsgTo, sendingMsgTo)));
+    }
+    private void setVideoCall(String sendingMsgTo) {
+        acallbtn.setIsVideoCall(true);
+        acallbtn.setResourceID("zego_uikit_call");
+        acallbtn.setInvitees(Collections.singletonList(new ZegoUIKitUser(sendingMsgTo, sendingMsgTo)));
+    }
+
 //    private void handlePdfUpload() {
 //        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
 //            ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
@@ -153,6 +186,13 @@ public class ChaaatPage extends AppCompatActivity {
             openFilePicker();
         }
     }
+//    private void handlePdfUpload() {
+//        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions((Activity) getApplicationContext(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+//        } else {
+//            openFilePicker();
+//        }
+//    }
 
 
 
@@ -169,6 +209,7 @@ public class ChaaatPage extends AppCompatActivity {
     }
 
 
+
     ActivityResultLauncher<Intent> filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if(result.getResultCode()==Activity.RESULT_OK){
             Uri pdfUri = result.getData().getData();
@@ -176,34 +217,79 @@ public class ChaaatPage extends AppCompatActivity {
         }
     });
 
+    private void showProgressBar(boolean show) {
+        progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+    }
+
+//    private void uploadFileToFirebase(Uri pdfUri) {
+//        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("pdfs/"+pdfUri.getLastPathSegment());
+//        storageReference.putFile(pdfUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//            @Override
+//            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                    @Override
+//                    public void onSuccess(Uri uri) {
+//                        String pdfDownloadUrl = uri.toString();
+//                        String urlMessage = "Your Report: "+pdfDownloadUrl;
+//                        etMsg.setText(urlMessage);
+//                        //set message
+//                        DatabaseReference reportRef = FirebaseDatabase.getInstance().getReference().child("reports");
+//                        reportRef.setValue(pdfDownloadUrl);
+//                        showProgressBar(false);
+//                    }
+//                });
+//            }
+//        }).addOnFailureListener(new OnFailureListener() {
+//            @Override
+//            public void onFailure(@NonNull Exception e) {
+//                Toast.makeText(ChaaatPage.this, "Failed to upload PDf", Toast.LENGTH_SHORT).show();
+//                showProgressBar(false);
+//            }
+//        });
+//    }
+
+    // Modify your existing uploadFileToFirebase method
     private void uploadFileToFirebase(Uri pdfUri) {
-        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("pdfs/"+pdfUri.getLastPathSegment());
-        storageReference.putFile(pdfUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        showProgressBar(true); // Show progress bar during upload
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("pdfs/" + pdfUri.getLastPathSegment());
+
+        UploadTask uploadTask = storageReference.putFile(pdfUri);
+
+        uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 storageReference.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                     @Override
                     public void onSuccess(Uri uri) {
                         String pdfDownloadUrl = uri.toString();
-                        String urlMessage = "Your Report: "+pdfDownloadUrl;
+                        String urlMessage = "Your Report: " + pdfDownloadUrl;
                         etMsg.setText(urlMessage);
-                        //set message
+                        // Set message
                         DatabaseReference reportRef = FirebaseDatabase.getInstance().getReference().child("reports");
                         reportRef.setValue(pdfDownloadUrl);
+                        showProgressBar(false); // Hide progress bar after upload
                     }
                 });
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(ChaaatPage.this, "Failed to upload PDf", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ChaaatPage.this, "Failed to upload PDF", Toast.LENGTH_SHORT).show();
+                showProgressBar(false); // Hide progress bar in case of failure
+            }
+        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onProgress(@NonNull UploadTask.TaskSnapshot taskSnapshot) {
+                double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+                // Update the progress bar with the percentage
+                progressBar.setProgress((int) progress);
             }
         });
     }
 
-    private void openFilePicker() {
 
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.M && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+    private void openFilePicker() {
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O && ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
             Intent i = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:"+getPackageName()));
             startActivity(i);
             return;
@@ -230,7 +316,8 @@ public class ChaaatPage extends AppCompatActivity {
                 String conversation;
                 if (sentBy.equals(UserName)) {
                     // Message sent by the user
-                    conversation = "You: \n" + msg + " \n";
+//                    conversation = "You: \n" + msg + " \n";
+                    conversation = "You: "+"\n" + msg + " \n";
                     addMessageToAdapter(conversation, R.layout.message_sent);
                 } else {
                     // Message received from others
@@ -245,8 +332,18 @@ public class ChaaatPage extends AppCompatActivity {
             TextView textView;
             if (layoutResId == R.layout.message_sent) {
                 textView = view.findViewById(R.id.textMessageSent);
+                textView.setTextIsSelectable(true);
+                textView.setLinksClickable(true);
+//                android:textIsSelectable="true"
+//                android:autoLink="all"
+//                android:linksClickable="true"
             } else {
                 textView = view.findViewById(R.id.textMessageReceived);
+                textView.setTextIsSelectable(true);
+                textView.setLinksClickable(true);
+                // Enable autoLink for TextView in received messages
+                textView.setAutoLinkMask(Linkify.WEB_URLS);
+                textView.setMovementMethod(LinkMovementMethod.getInstance());
             }
             textView.setText(message);
             arrayAdpt.insert(message, arrayAdpt.getCount());

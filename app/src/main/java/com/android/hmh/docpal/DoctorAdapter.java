@@ -31,10 +31,6 @@ public class DoctorAdapter extends ArrayAdapter<Doctor> {
     private List<Doctor> doctorList;
 
 
-
-
-
-
     String[] s1  = new String[]{"4:00 PM", "5:00 PM", "6:00 PM", "7:00 PM"};
     String[] s2  = new String[]{"1:00 PM", "4:00 PM", "7:00 PM", "8:00 PM"};
     String[] s3  = new String[]{"12:00 PM", "1:00 PM", "3:00 PM", "4:00 PM"};
@@ -77,6 +73,7 @@ public class DoctorAdapter extends ArrayAdapter<Doctor> {
         doctorName.setText(currentDoctor.getName());
         doctorExperience.setText(currentDoctor.getExperience()+" Years of Experience");
         doctorRatings.setText(currentDoctor.getRatings()+" ratings");
+        String hopeRatingsWorks = currentDoctor.getRatings();
 
         bookNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,8 +84,9 @@ public class DoctorAdapter extends ArrayAdapter<Doctor> {
                 String name = selectedDoctor.getName();
                 String imageUrl = selectedDoctor.getImageUrl();
                 String experience = selectedDoctor.getExperience();
-                String ratings = currentDoctor.getRatings();
+                String ratings = hopeRatingsWorks;
 //                String ratings = selectedDoctor.getRatings();
+//                String ratings = currentDoctor.getRatings();
 
                 //bundling to pass
                 Bundle doctorDetails = new Bundle();

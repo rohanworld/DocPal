@@ -139,20 +139,19 @@
 
     <TextView
         android:id="@+id/AISymptoms"
-        android:layout_width="319dp"
-        android:layout_height="110dp"
+        android:layout_width="315dp"
+        android:layout_height="195dp"
         android:ems="10"
         android:fontFamily="@font/dinroundpro_medium"
-        android:gravity="start|top"
         android:hint="Based on Symptoms it is describes as mere cold and cough due to allergy"
         android:inputType="textMultiLine"
         android:padding="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.434"
+        app:layout_constraintHorizontal_bias="0.416"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.856" />
+        app:layout_constraintVertical_bias="0.966" />
 
     <TextView
         android:id="@+id/userGender"
