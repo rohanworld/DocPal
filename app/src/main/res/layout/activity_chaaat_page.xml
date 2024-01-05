@@ -8,6 +8,7 @@
     android:layout_height="match_parent"
     tools:context=".ChaaatPage">
 
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar2"
         android:layout_width="match_parent"
@@ -31,17 +32,19 @@
             android:textSize="24sp"
             tools:layout_editor_absoluteX="54dp"
             tools:layout_editor_absoluteY="26dp" />
+        <ImageView
+            android:id="@+id/acallerbtn"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/acallicon" />
+        <ImageView
+            android:id="@+id/vcallerbtn"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            app:srcCompat="@drawable/vcallicon" />
 
-        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:id="@+id/vcallbtn"/>
-        <com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton
-            android:layout_width="60dp"
-            android:layout_height="50dp"
-            android:gravity="center"
-            android:id="@+id/acallbtn"/>
+
+
     </androidx.appcompat.widget.Toolbar>
 
     <ProgressBar

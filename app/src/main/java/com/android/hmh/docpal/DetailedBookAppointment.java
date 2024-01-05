@@ -2,12 +2,21 @@ package com.android.hmh.docpal;
 
 import static java.util.Calendar.*;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,6 +49,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import android.Manifest;
+
 public class DetailedBookAppointment extends AppCompatActivity {
 
     ImageView doctorImage;
@@ -50,6 +61,9 @@ public class DetailedBookAppointment extends AppCompatActivity {
     String[] timeSlots;
     RadioGroup timeSlotsRadioGroup, datesRadioGroup;
     String doctorNameForDocument, patientSymptoms;
+
+    NotificationCompat.Builder builder;
+    NotificationManager notificationManager;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -66,6 +80,7 @@ public class DetailedBookAppointment extends AppCompatActivity {
         timeSlotsRadioGroup = findViewById(R.id.timeSlotsRadioGroup);
         datesRadioGroup = findViewById(R.id.datesRadioGroup);
 
+        askNotificationsPermission();
         Bundle doctorDetails = getIntent().getExtras();
         if (doctorDetails != null) {
             docName = doctorDetails.getString("name");
@@ -109,6 +124,7 @@ public class DetailedBookAppointment extends AppCompatActivity {
         Calendar calendar = Calendar.getInstance();
         for (int i =0; i<3; i++){
             RadioButton radioButton = new RadioButton(DetailedBookAppointment.this);
+//            radioButton.setText((sdf.format(calendar.getTime())).toUpperCase() +"\n"+timeSlots.length+" Slots");
             radioButton.setText((sdf.format(calendar.getTime())).toUpperCase());
             radioButton.setBackground(getResources().getDrawable(R.drawable.custom_timeslot_radio_button));
             radioButton.setGravity(Gravity.CENTER);
@@ -256,6 +272,9 @@ public class DetailedBookAppointment extends AppCompatActivity {
                                 Toast.makeText(DetailedBookAppointment.this, "Booked Confirmed", Toast.LENGTH_SHORT).show();
                                 //start new intetn for bokingconfirmed actiit
                                 Intent i = new Intent(DetailedBookAppointment.this, BookingConfirmedPage.class);
+
+                                showNotifications();
+
                                 startActivity(i);
                                 finish();
                             }
@@ -277,6 +296,37 @@ public class DetailedBookAppointment extends AppCompatActivity {
         }
     }
 
+    private final ActivityResultLauncher<String> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), new ActivityResultCallback<Boolean>() {
+        @Override
+        public void onActivityResult(Boolean o) {
+            if(o){
+                Toast.makeText(DetailedBookAppointment.this, "Notifications Permission Received", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(DetailedBookAppointment.this, "Notifications Permission NOT Received", Toast.LENGTH_SHORT).show();
+            }
+        }
+    });
+    private void askNotificationsPermission() {
+        builder = new NotificationCompat.Builder(DetailedBookAppointment.this, "notify_appt")
+                .setSmallIcon(R.drawable.baseline_calendar_today_24)
+                .setContentTitle(getString(R.string.app_name))
+                .setContentText("Booking Successfull")
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        notificationManager = getSystemService(NotificationManager.class);
+    }
+
+    private void showNotifications(){
+        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.TIRAMISU && ActivityCompat.checkSelfPermission(DetailedBookAppointment.this, Manifest.permission.POST_NOTIFICATIONS)!= PackageManager.PERMISSION_GRANTED){
+            activityResultLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }else{
+            if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.O){
+                NotificationChannel notificationChannel = new NotificationChannel("testHere", getString(R.string.app_name), NotificationManager.IMPORTANCE_DEFAULT);
+                notificationChannel.setDescription("Appointment Booking Successful");
+                notificationManager.createNotificationChannel(notificationChannel);
+                notificationManager.notify(10, builder.build());
+            }
+        }
+    }
     private void addBookingDetailsToMyDocumentAlso(String docName, String docExp, String docRatings, String docImg, String patientSymptoms, String selectedTimeSlot, String currentDate) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").whereEqualTo("name", Registration.getUserName(DetailedBookAppointment.this)).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {

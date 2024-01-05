@@ -23,7 +23,6 @@ public class DoctorProfilePage extends AppCompatActivity {
         doctorLogOutButton = findViewById(R.id.doctorLogOutButton);
         docotNameInProfilePage = findViewById(R.id.docotNameInProfilePage);
 
-
         String userName = DoctorLogin.getDoctorName(getApplicationContext());
         docotNameInProfilePage.setText(userName);
         doctorLogOutButton.setOnClickListener(new View.OnClickListener() {
