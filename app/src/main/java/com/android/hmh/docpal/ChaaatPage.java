@@ -1,7 +1,5 @@
 package com.android.hmh.docpal;
 
-import static android.app.Activity.RESULT_OK;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -12,6 +10,8 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -23,7 +23,6 @@ import android.text.util.Linkify;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -43,26 +42,26 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.zegocloud.uikit.prebuilt.call.invite.widget.ZegoSendCallInvitationButton;
-import com.zegocloud.uikit.service.defines.ZegoUIKitUser;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class ChaaatPage extends AppCompatActivity {
     public static final int STORAGE_PERMISSION_CODE = 1;
-    public static final int PDF_REQUEST_CODE = 2;
+//    public static final int PDF_REQUEST_CODE = 2;
+
+//    public static final int STORAGE_PERMISSION_CODE = 1;
+    public static final int CAMERA_PERMISSION_CODE = 2;
+    public static final int AUDIO_PERMISSION_CODE = 3;
     TextView doctorNameHereForNewChat;
     ImageButton btnSendMsg;
-    ImageView attachFileBtn;
+    ImageView attachFileBtn, acallbtn, vcallbtn;
     EditText etMsg;
 
     ProgressBar progressBar;
-    ZegoSendCallInvitationButton vcallbtn, acallbtn;
-    ListView lvDiscussion;
+     ListView lvDiscussion;
     ArrayList<String> listConversation = new ArrayList<String>();
     ArrayAdapter arrayAdpt;
     String UserName, SelectedTopic, user_msg_key, sendingMsgTo;
@@ -78,8 +77,40 @@ public class ChaaatPage extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
         doctorNameHereForNewChat = findViewById(R.id.doctorNameHereForNewChat);
         attachFileBtn = findViewById(R.id.attachFileBtn);
-        vcallbtn = findViewById(R.id.vcallbtn);
-        acallbtn = findViewById(R.id.acallbtn);
+        vcallbtn = findViewById(R.id.vcallerbtn);
+        acallbtn = findViewById(R.id.acallerbtn);
+
+        vcallbtn.setOnClickListener(view -> {
+//            sendCallStartedMessage("Video ");
+//            openWebView();
+
+            checkPermissionsAndOpenWebView();
+//            if (checkCameraPermission() && checkAudioPermission()) {
+//                sendCallStartedMessage("Video ");
+//                openWebView();
+//            } else {
+//                showAlert("Camera and audio permissions are required for initiating a video call");
+//            }
+        });
+        acallbtn.setOnClickListener(view -> {
+            checkPermissionsAndOpenWebView();
+//            sendCallStartedMessage("Audio ");
+//            openWebView();
+//            if (checkAudioPermission()) {
+//                sendCallStartedMessage("Audio ");
+//                openWebView();
+//            } else {
+//                showAlert("Audio permission is required for initiating a call");
+//            }
+        });
+        vcallbtn.setOnLongClickListener(view -> {
+            openChrome();
+            return false;
+        });
+        acallbtn.setOnLongClickListener(view -> {
+            openChrome();
+            return false;
+        });
 
 
         btnSendMsg = findViewById(R.id.btnSendMsg);
@@ -87,8 +118,6 @@ public class ChaaatPage extends AppCompatActivity {
 
         sendingMsgTo = getIntent().getStringExtra("doctorName");
         UserName = Registration.getUserName(ChaaatPage.this);
-        setVoiceCall(sendingMsgTo);
-        setVideoCall(sendingMsgTo);
 
 
 
@@ -153,16 +182,89 @@ public class ChaaatPage extends AppCompatActivity {
         });
     }
 
-    private void setVoiceCall(String sendingMsgTo) {
-        vcallbtn.setIsVideoCall(false);
-        vcallbtn.setResourceID("zego_uikit_call");
-        vcallbtn.setInvitees(Collections.singletonList(new ZegoUIKitUser(sendingMsgTo, sendingMsgTo)));
+    private void checkPermissionsAndOpenWebView() {
+//        if (checkCameraPermission() && checkAudioPermission()) {
+//            sendCallStartedMessage("Video ");
+//            openWebView();
+//        } else {
+////            showAlert("Camera and audio permissions are required for initiating a video call");
+//        }
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+        }else{
+            //camera granted, ask audio
+            requestAudioPermissionAndOpenWebView();
+        }
     }
-    private void setVideoCall(String sendingMsgTo) {
-        acallbtn.setIsVideoCall(true);
-        acallbtn.setResourceID("zego_uikit_call");
-        acallbtn.setInvitees(Collections.singletonList(new ZegoUIKitUser(sendingMsgTo, sendingMsgTo)));
+
+    private void requestAudioPermissionAndOpenWebView() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED){
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
+        }else{
+            // camera and audio premission received, open webview
+            openWebView();
+        }
     }
+
+//    private boolean checkCameraPermission() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
+//            return false;
+//        }
+//        return true;
+//    }
+//
+//    private boolean checkAudioPermission() {
+//        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_PERMISSION_CODE);
+//            return false;
+//        }
+//        return true;
+//    }
+
+    private void openWebView() {
+        sendCallStartedMessage();
+        Intent i =new Intent(ChaaatPage.this, WebViewForCall.class);
+        i.putExtra("websiteName", "https://www.experte.com/online-meeting?join=zOCg33ysz1");
+        startActivity(i);
+
+    }
+
+//    private void sendCallStartedMessage(String CallStarted) {
+//        etMsg.setText(CallStarted);
+//    }
+private void sendCallStartedMessage() {
+    String message = "Video Call Started";
+
+    // Update the local UI
+//    etMsg.setText(message);
+
+    // Send the message to Firebase
+    Map<String, Object> map = new HashMap<>();
+    user_msg_key = dbr.push().getKey();
+    dbr.updateChildren(map);
+
+    DatabaseReference dbr2 = dbr.child(user_msg_key);
+    Map<String, Object> map2 = new HashMap<>();
+    map2.put("msgContent", message);
+    map2.put("sentBy", UserName);
+    map2.put("sentTo", sendingMsgTo);
+    dbr2.updateChildren(map2);
+}
+
+
+    private void openChrome() {
+        String callUrl = "https://www.experte.com/online-meeting?join=zOCg33ysz1";
+        Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(callUrl));
+        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        i.setPackage("com.android.chrome");
+        try{
+            startActivity(i);
+        }catch (ActivityNotFoundException e){
+            Toast.makeText(this, "Chrome Not Found", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 //    private void handlePdfUpload() {
 //        if(ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)!= PackageManager.PERMISSION_GRANTED){
@@ -203,11 +305,23 @@ public class ChaaatPage extends AppCompatActivity {
             if(grantResults.length>0 && grantResults[0] == PackageManager.PERMISSION_GRANTED){
                 openFilePicker();
             }else {
-                Toast.makeText(this, "Permission Required broo", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this, "Permission Required broo", Toast.LENGTH_SHORT).show();
+                showAlert("This Device runs on MIUI 14.0.1. For Security reasons, Files and Camera access restricted for apps from Unknown Developers");
             }
         }
     }
 
+    private void showAlert(String message) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(ChaaatPage.this);
+        builder.setTitle("Restricted Access Alert");
+        builder.setMessage(message);
+        builder.setPositiveButton("Dismiss", null);
+        builder.setIcon(R.drawable.baseline_warning_24);
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        
+    }
 
 
     ActivityResultLauncher<Intent> filePickerLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -313,17 +427,34 @@ public class ChaaatPage extends AppCompatActivity {
                 sentBy = (String) ((DataSnapshot) i.next()).getValue();
                 sentTo = (String) ((DataSnapshot) i.next()).getValue();
 
+//                String conversation;
+//                if (sentBy.equals(UserName)) {
+//                    // Message sent by the user
+////                    conversation = "You: \n" + msg + " \n";
+//                    conversation = "You: "+"\n" + msg + " \n";
+//                    addMessageToAdapter(conversation, R.layout.message_sent);
+//                } else {
+//                    // Message received from others
+//                    conversation = sentBy + ": \n" + msg + " \n";
+//                    addMessageToAdapter(conversation, R.layout.message_received);
+//                }
+
                 String conversation;
                 if (sentBy.equals(UserName)) {
                     // Message sent by the user
-//                    conversation = "You: \n" + msg + " \n";
-                    conversation = "You: "+"\n" + msg + " \n";
+                    conversation = "You: " + "\n" + msg + " \n";
                     addMessageToAdapter(conversation, R.layout.message_sent);
                 } else {
                     // Message received from others
-                    conversation = sentBy + ": \n" + msg + " \n";
+                    if (msg.contains("Call Started")) {
+                        // Handle Call Started message separately
+                        conversation = sentBy + ": " + "\n" + msg + " \n";
+                    } else {
+                        conversation = sentBy + ": " + "\n" + msg + " \n";
+                    }
                     addMessageToAdapter(conversation, R.layout.message_received);
                 }
+
             }
         }
 
@@ -365,6 +496,9 @@ public class ChaaatPage extends AppCompatActivity {
 //            arrayAdpt.notifyDataSetChanged();
 //        }
 //    }
+
+
+
 }
 
 

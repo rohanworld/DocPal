@@ -17,10 +17,6 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
-import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -129,8 +125,7 @@ public class Registration extends AppCompatActivity {
 
                 // Start next activity if all fields are filled and passwords match
                 if (allFieldsFilled) {
-                    startService(userEnteredName);
-//                    String allString = userEnteredName + userEnteredGmail + userEnteredGender + userEnteredDOB +age+userEnteredPassword;
+ //                    String allString = userEnteredName + userEnteredGmail + userEnteredGender + userEnteredDOB +age+userEnteredPassword;
                     Intent enterNumber = new Intent(Registration.this, PhoneNumber.class);
                     enterNumber.putExtra("name", userEnteredName);
                     enterNumber.putExtra("mail", userEnteredGmail);
@@ -205,21 +200,4 @@ public class Registration extends AppCompatActivity {
 //    String userGender = Registration.getUserGender(getApplicationContext());
 //    int userAge = Registration.getUserAge(getApplicationContext());
 
-    private void startService(String userID) {
-        Application application = getApplication() ; // Android's application context
-        long appID = 55023617;   // yourAppID
-        String appSign = "e06f4dc7104a44c637b0e76d1e5e16fdb31c01b9208cd49901375dd3b904de01";  // yourAppSign
-        String userName = userID;
-        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
-        ZegoNotificationConfig notificationConfig = new ZegoNotificationConfig();
-        notificationConfig.sound = "zego_uikit_sound_call";
-        notificationConfig.channelID = "CallInvitation";
-        notificationConfig.channelName = "CallInvitation";
-        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
-    }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        ZegoUIKitPrebuiltCallInvitationService.unInit();
-    }
 }

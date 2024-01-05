@@ -53,6 +53,5 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-analytics")
 
-    implementation("com.github.ZEGOCLOUD:zego_uikit_prebuilt_call_android:+")
 
 }
